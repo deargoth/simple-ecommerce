@@ -45,23 +45,23 @@ class Product(models.Model):
         if not self.slug:
             self.slug = slugify(self.name)
 
+        super().save(*args, **kwargs)
+
         max_image_size = 800
 
         if self.image:
             self.resize_image(self.image, max_image_size)
-
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
 
 
 class Variation(models.Model):
-    name = models.CharField(max_length=255)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    name = models.CharField(max_length=50, blank=True, null=True)
     price = models.FloatField()
     promotional_price = models.FloatField(default=0)
     stock = models.PositiveIntegerField()
 
     def __str__(self):
-        return f'Variação {self.name} - {self.product}'
+        return self.name or self.product.name
