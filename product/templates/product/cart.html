@@ -4,6 +4,7 @@
 
 {% block content %}
 
+{% if request.session.cart %}
 <div class="row mt-3">
     <div class="col">
         <h3>Carrinho de compras</h3>
@@ -81,6 +82,13 @@
         </a>
     </div>
 </div>
-
+{% else %}
+<div class="row mt-3">
+    <div class="col">
+        <h3>Seu carrinho de compras está vazio!</h1>
+        <p class="lead">Não há produtos no seu carrinho no momento! <a href="{% url 'product:index' %}">Compre em nossa loja.</a></p>
+    </div>
+</div>
+{% endif %}
 
 {% endblock content %}

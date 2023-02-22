@@ -98,4 +98,23 @@ class Cart(View):
 
 class DelFromCart(View):
     def get(self, *args, **kwargs):
+        cart = self.request.session.get('cart')
+        vid_id = str(self.kwargs['pk'])
+
+        quantity = cart[vid_id]['quantity']
+        unit_price = cart[vid_id]['unit_price']
+        promotional_unit_price = cart[vid_id]['promotional_unit_price']
+
+        quantity -= 1
+
+        if quantity <= 0:
+            cart.pop(vid_id)
+            self.request.session.save()
+            return redirect('product:cart')
+
+        cart[vid_id]['quantity'] = quantity
+        cart[vid_id]['quant_price'] = unit_price * quantity
+        cart[vid_id]['promotional_quant_price'] = promotional_unit_price * quantity
+
+        self.request.session.save()
         return redirect('product:cart')
