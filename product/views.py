@@ -10,6 +10,7 @@ class Index(ListView):
     template_name = 'product/index.html'
     paginate_by = 6
     context_object_name = 'products'
+    ordering = '-id'
 
 
 class Details(DetailView):
@@ -79,7 +80,22 @@ class AddToCart(View):
                 'image': image
             }
 
-        pprint(cart)
         self.request.session.save()
 
         return redirect(http_referer)
+
+
+class Cart(View):
+    template_name = 'product/cart.html'
+
+    def get(self, *args, **kwargs):
+        self.context = {
+            'cart': self.request.session.get('cart')
+        }
+
+        return render(self.request, self.template_name, self.context)
+
+
+class DelFromCart(View):
+    def get(self, *args, **kwargs):
+        return redirect('product:cart')

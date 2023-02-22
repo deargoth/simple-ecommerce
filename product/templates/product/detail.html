@@ -19,8 +19,8 @@
                     <p class="lead">{{ product.short_description }}</p>
                     <p class="lead">
                         {% if product.promotional_marketing_price %}
-                        <span id="variation-preco" class="lead product-price">{{ product.promotional_marketing_price|currency }}</span>
-                        <span id="variation-preco-promocional"
+                        <span id="variation-preco-promocional" class="lead product-price">{{ product.promotional_marketing_price|currency }}</span>
+                        <span id="variation-preco"
                             class="lead product-old-price text-muted">{{ product.marketing_price|currency }}</span>
                         {% endif %}
                     </p>
