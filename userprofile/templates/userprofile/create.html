@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<form action="{% url 'profile:create' %}" method="post">
+    {% csrf_token %}
+
+    <div class="row">
+        <div class="col">
+            <h1>Login</h1>
+        </div>
+
+        <div class="col">
+            <h1>Registrar-se</h1>
+            {{ registeruser|crispy }}
+            {{ registerprofile|crispy }}
+            <div class="row">
+                <div class="col">
+                    <button type="submit" class="btn btn-lock btn-primary btn-lg">Registrar</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</form>
+
+{% endblock content %}
+

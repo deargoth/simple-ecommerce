@@ -2,7 +2,8 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, View
 from .models import Product, Variation
-from pprint import pprint
+from django.contrib.auth import logout
+import copy
 
 
 class Index(ListView):

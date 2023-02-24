@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
+from utils.validacpf import valida_cpf
+from django.forms import ValidationError
+import re
 
 
 class Profile(models.Model):
@@ -45,3 +48,23 @@ class Profile(models.Model):
             ('TO', 'Tocantins'),
         )
     )
+
+    def __str__(self):
+        return f'{self.user.first_name} {self.user.last_name}'
+
+    def clean(self, *args, **kwargs):
+        error_messages = {}
+
+        cpf_db = Profile.objects.filter(cpf=self.cpf).first()
+
+        if cpf_db:
+            error_messages['cpf'] = 'Este CPF já está sendo usado por outro usuário'
+
+        if not valida_cpf(self.cpf):
+            error_messages['cpf'] = 'Seu CPF está inválido. Digite-o novamente e sem a pontuação'
+
+        if len(self.cep) < 8:
+            error_messages['cep'] = 'Seu CEP está inválido. Digite-o novamente e sem a pontuação'
+
+        if error_messages:
+            raise ValidationError(error_messages)
