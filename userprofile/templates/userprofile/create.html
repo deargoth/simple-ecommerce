@@ -3,28 +3,35 @@
 
 {% block content %}
 
-<form action="{% url 'profile:create' %}" method="post">
-    {% csrf_token %}
+<div class="row">
+    <div class="col">
+        <h1>Login</h1>
+        <form action="{% url 'profile:login' %}" method="post">
+            {% csrf_token %}
+            {{ userlogin|crispy }}
+            <div class="row">
+                <div class="col">
+                    <button type="submit" class="btn btn-lock btn-primary btn-lg">Login</button>
+                </div>
+            </div>
+        </form>
+    </div>
 
-    <div class="row">
-        <div class="col">
-            <h1>Login</h1>
-        </div>
-
-        <div class="col">
-            <h1>Registrar-se</h1>
-            {{ registeruser|crispy }}
-            {{ registerprofile|crispy }}
+    <div class="col">
+        <h1>Registrar-se</h1>
+        <form action="{% url 'profile:create' %}" method="post">
+            {% csrf_token %}
+            {{ userregister|crispy }}
+            {{ userprofileregister|crispy }}
             <div class="row">
                 <div class="col">
                     <button type="submit" class="btn btn-lock btn-primary btn-lg">Registrar</button>
                 </div>
             </div>
+        </form>
 
-        </div>
     </div>
-
-</form>
+</div>
 
 {% endblock content %}
 

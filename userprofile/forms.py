@@ -15,3 +15,9 @@ class RegisterProfile(forms.ModelForm):
         model = Profile
         fields = '__all__'
         exclude = ('user', )
+
+
+class UserLogin(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('username', 'password', )
