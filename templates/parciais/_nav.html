@@ -12,10 +12,11 @@
             <li class="nav-item active">
                 <a class="nav-link" href="{% url 'product:index' %}">Home <span class="sr-only">(current)</span></a>
             </li>
+            {% if request.user.is_authenticated %}
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Informações
+                    Informações da conta
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <a class="dropdown-item" href="#">Action</a>
@@ -24,6 +25,12 @@
                     <a class="dropdown-item" href="#">Conta</a>
                 </div>
             </li>
+            {% endif %}
+            {% if not request.user.is_authenticated %}
+                <li class="nav-item active">
+                    <a class="nav-link" href="{% url 'profile:create' %}">Login <span class="sr-only">(current)</span></a>
+                </li>
+            {% endif %}
             {% if request.session.cart %}
             <li class="nav-item">
                 <a class="nav-link nav-cart-link active" href="{% url 'product:cart' %}">
