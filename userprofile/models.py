@@ -55,10 +55,15 @@ class Profile(models.Model):
     def clean(self, *args, **kwargs):
         error_messages = {}
 
-        cpf_db = Profile.objects.filter(cpf=self.cpf).first()
+        sent_cpf = self.cpf
+        saved_cpf = None
+        profile = Profile.objects.filter(cpf=sent_cpf).first()
 
-        if cpf_db:
-            error_messages['cpf'] = 'Este CPF já está sendo usado por outro usuário'
+        if profile:
+            saved_cpf = profile.cpf
+
+            if saved_cpf is not None and self.pk != profile.pk:
+                error_messages['cpf'] = 'Este CPF já está sendo usado por outro usuário'
 
         if not valida_cpf(self.cpf):
             error_messages['cpf'] = 'Seu CPF está inválido. Digite-o novamente e sem a pontuação'

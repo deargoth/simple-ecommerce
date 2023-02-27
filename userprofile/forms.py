@@ -18,6 +18,17 @@ class RegisterProfile(forms.ModelForm):
 
 
 class UserLogin(forms.ModelForm):
+    password = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput()
+    )
+
     class Meta:
         model = User
         fields = ('username', 'password', )
+
+
+class UserData(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email', )
