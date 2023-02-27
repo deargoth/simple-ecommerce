@@ -2,8 +2,7 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, View
 from .models import Product, Variation
-from django.contrib.auth import logout
-import copy
+from django.http import HttpResponse
 
 
 class Index(ListView):
@@ -119,3 +118,25 @@ class DelFromCart(View):
 
         self.request.session.save()
         return redirect('product:cart')
+
+
+class Finalize(View):
+    template_name = 'product/resume.html'
+
+    def get(self, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            messages.error(self.request,
+                           'Você precisa estar logado para finalizar sua compra')
+            return redirect('profile:create')
+
+        if not self.request.session.get('cart'):
+            messages.error(self.request,
+                           'Seu carrinho está vaziado!')
+            return redirect('product:index')
+
+        self.context = {
+            'user': self.request.user,
+            'cart': self.request.session.get('cart'),
+        }
+
+        return render(self.request, self.template_name, self.context)
