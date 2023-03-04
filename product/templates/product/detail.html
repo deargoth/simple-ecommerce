@@ -41,10 +41,17 @@
                         </div>
 
                         <div class="text-left">
+                            {% comment %} {% if product.variation.stock > 0 %} {% endcomment %}
                             <button type="submit" class="btn btn-primary btn-lg btn-block">
                                 <i class="fa fa-shopping-cart" aria-hidden="true"></i>
                                 Adicionar ao carrinho
                             </button>
+                            {% comment %} {% else %} {% endcomment %}
+                            {% comment %} <button type="submit" class="btn btn-primary btn-lg btn-block" disabled>
+                                <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                                Produto esgotado
+                            </button> {% endcomment %}
+                            {% comment %} {% endif %} {% endcomment %}
                         </div>
 
                     </form>

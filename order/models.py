@@ -27,7 +27,7 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     product = models.CharField(max_length=255)
     product_id = models.PositiveIntegerField()
-    variation = models.CharField(max_length=255)
+    variation = models.CharField(max_length=255, blank=True, null=True)
     variation_id = models.PositiveIntegerField()
     price = models.FloatField()
     promotional_price = models.FloatField(default=0)
@@ -36,3 +36,9 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f'Item do pedido {self.order}'
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if not self.variation:
+            self.variation = self.product

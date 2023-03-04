@@ -1,8 +1,10 @@
 from django.contrib import messages
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.views.generic import ListView, DetailView, View
 from .models import Product, Variation
 from django.http import HttpResponse
+from pprint import pprint
 
 
 class Index(ListView):
@@ -18,6 +20,14 @@ class Details(DetailView):
     template_name = 'product/detail.html'
     slug_url_kwarg = 'slug'
     context_object_name = 'product'
+
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     print(self.request)
+    #     # context['variation'] = Variation.objects.get(
+    #     #     product__slug__iexact=slug)
+
+    #     return context
 
 
 class AddToCart(View):
@@ -47,19 +57,31 @@ class AddToCart(View):
         slug = product.slug
         image = product.image.name
 
+        if not variation_name:
+            cart_add_message = f'O produto {product_name} foi adicionado ao seu carrinho com sucesso'
+
+        else:
+            cart_add_message = f'O produto {product_name} - {variation_name} foi adicionado ao seu carrinho com sucesso'
+
+        if variation.stock == 0:
+            messages.error(self.request,
+                           'Infelizmente o estoque deste produto se esgotou')
+            return redirect(reverse('product:details', kwargs={'slug': slug}))
+
         if str(variation_id) in cart:
             cart_quantity = cart[vid]['quantity']
             unit_price = cart[vid]['unit_price']
             promotional_unit_price = cart[vid]['promotional_unit_price']
+            cart_quantity += 1
 
             if cart_quantity > variation_stock:
                 messages.error(self.request,
                                f'O estoque do produto {product_name} foi excedido. Adicionamos {variation_stock}x\
                                    em seu carrinho.')
 
-                cart_quantity = variation_stock
-
-            cart_quantity += 1
+                cart[vid]['quantity'] = variation_stock
+                self.request.session.save()
+                return redirect(http_referer)
 
             cart[vid]['quantity'] = cart_quantity
             cart[vid]['quant_price'] = unit_price * cart_quantity
@@ -82,6 +104,8 @@ class AddToCart(View):
 
         self.request.session.save()
 
+        messages.success(self.request,
+                         cart_add_message)
         return redirect(http_referer)
 
 
@@ -92,6 +116,21 @@ class Cart(View):
         self.context = {
             'cart': self.request.session.get('cart')
         }
+
+        cart = self.context['cart']
+        cart_keys = cart.keys()
+
+        for key in cart_keys:
+            if cart[key]['quantity'] == 0:
+                removed_item = f'O produto {cart[key]["product_name"]} foi removido do seu carrinho'
+
+                cart.pop(key)
+                self.request.session.save()
+
+                messages.error(self.request,
+                               removed_item)
+
+                return redirect('product:cart')
 
         return render(self.request, self.template_name, self.context)
 
