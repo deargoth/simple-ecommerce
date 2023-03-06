@@ -1,3 +1,4 @@
+import locale
 from django.conf import settings
 from PIL import Image
 
@@ -19,3 +20,9 @@ def resize_image(img, new_width=800):
         optimize=True,
         quality=50
     )
+
+
+def currency(value):
+    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+    valor = locale.currency(value, grouping=True, symbol=None)
+    return f'R${valor}'

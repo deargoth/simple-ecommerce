@@ -23,6 +23,12 @@ class Product(models.Model):
         )
     )
 
+    def formatted_price(self):
+        return utils.currency(self.price)
+
+    def formatted_promotional_price(self):
+        return utils.currency(self.promotional_price)
+
     def save(self, *args, **kwargs):
         if not self.slug:
             slug = f'{slugify(self.name)}'

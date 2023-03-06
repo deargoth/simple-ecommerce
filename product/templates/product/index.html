@@ -2,19 +2,25 @@
 
 {% block content %}
 <div class="card-columns">
+    {% for product in products %}
     <div class="card">
-        <img class="card-img-top" src="imgs/squared.jpg" alt="Card image cap">
+        <img class="card-img-top" src="{{ product.image.url }}" alt="Card image cap">
         <div class="card-body">
-            <h5 class="card-title">Card title that wraps to a new line</h5>
-            <p class="card-text">This is a longer card with supporting text below as a natural lead-in
-                to additional content. This content is a little bit longer.</p>
+            <h5 class="card-title">{{ product.name }}</h5>
+            <p class="card-text">{{ product.short_description }}</p>
             <div class="container product-price-block text-center">
+                {% if product.promotional_price %}
                 <span class="product-price">
-                    R$ 54,90
+                    {{ product.formatted_promotional_price }}
                 </span>
                 <span class="product-old-price text-muted">
-                    R$ 99,90
+                    {{ product.formatted_price }}
                 </span>
+                {% else %}
+                <span class="product-price">
+                    {{ product.formatted_price }}
+                </span>
+                {% endif %}
             </div>
         </div>
         <div class="card-footer bg-transparent border-top-light-custom text-center">
@@ -24,5 +30,6 @@
             </a>
         </div>
     </div>
+    {% endfor %}
 </div>
 {% endblock content %}

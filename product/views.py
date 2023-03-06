@@ -1,8 +1,10 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from .models import Product
 from django.views.generic import ListView, View
 
 
-class Index(View):
-    def get(self, *args, **kwargs):
-        return render(self.request, 'product/index.html')
+class Index(ListView):
+    model = Product
+    template_name = 'product/index.html'
+    context_object_name = 'products'
+    paginate_by = 3
