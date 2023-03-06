@@ -5,4 +5,4 @@ from django.views.generic import ListView, View
 
 class Index(View):
     def get(self, *args, **kwargs):
-        return HttpResponse('Index')
+        return render(self.request, 'product/index.html')
