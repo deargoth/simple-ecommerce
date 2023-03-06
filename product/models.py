@@ -52,6 +52,12 @@ class Variation(models.Model):
     promotional_price = models.FloatField(default=0)
     stock = models.PositiveIntegerField(default=1)
 
+    def formatted_price(self):
+        return utils.currency(self.price)
+
+    def formatted_promotional_price(self):
+        return utils.currency(self.promotional_price)
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
