@@ -24,35 +24,40 @@
                 <span id="variation-preco" class="lead product-price">{{ product.formatted_price }}</span>
                 {% endif %}
             </p>
-
-            <form action="/addtocart/" id="form-add-to-cart">
+            
+            <form action="{% url 'product:add_to_cart' %}" id="form-add-to-cart">
                 {% if product.type == 'V' %}
                 <div class="form-group">
                     <select id="select-variacoes" name="vid" class="form-control form-control-lg">
-                            {% for variation in product.variation_set.all %}
-                                {% if variation.promotional_price %}
-                                    <option data-preco="{{ variation.formatted_price }}" 
-                                    data-preco-promocional="{{ variation.formatted_promotional_price }}" 
-                                    value="{{ variation.id }}">
-                                    {{ variation.name }}
-                                {% else %}
-                                    <option data-preco-promocional="{{ variation.formatted_price }}" 
-                                    value="{{ variation.id }}">
-                                    {{ variation.name }}
-                                {% endif %}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
+                        {% for variation in product.variation_set.all %}
+                            {% if variation.promotional_price %}
+                                <option data-preco="{{ variation.formatted_price }}" 
+                                data-preco-promocional="{{ variation.formatted_promotional_price }}" 
+                                value="{{ variation.id }}">
+                                {{ variation.name }}
+                            {% else %}
+                                <option data-preco-promocional="{{ variation.formatted_price }}" 
+                                value="{{ variation.id }}">
+                                {{ variation.name }}
+                            {% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% else %}
+                <div class="form-group" style="display: none;">
+                    <select name="pid" class="form-control form-control-lg">
+                        <option value="{{ product.id }}"></option>
+                    </select>
+                </div>
                 {% endif %}
 
                 <div class="text-left">
-                    <button type="submit" class="btn btn-primary btn-lg btn-block">
-                        <i class="fa fa-shopping-cart" aria-hidden="true"></i>
-                        Adicionar ao carrinho
-                    </button>
+                <button type="submit" class="btn btn-primary btn-lg btn-block">
+                    <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                    Adicionar ao carrinho
+                </button>
                 </div>
-
             </form>
 
 
