@@ -26,3 +26,27 @@ def currency(value):
     locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
     valor = locale.currency(value, grouping=True, symbol=None)
     return f'R${valor}'
+
+
+def cart_total_value(cart):
+    return sum(
+        [
+            price['promotional_quant_price']
+            if
+            price['promotional_quant_price']
+            else
+            price['quant_price']
+            for price
+            in cart.values()
+        ]
+    )
+
+
+def total_items_in_cart(cart):
+    return sum(
+        [
+            item['quantity']
+            for item
+            in cart.values()
+        ]
+    )

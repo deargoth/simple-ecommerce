@@ -39,7 +39,7 @@ class AddToCart(View):
             product_name = product.name
             product_id = product.pk
             variation_name = variation.name
-            variation_pk = variation.pk
+            variation_id = variation.pk
             variation_price = variation.price
             variation_promotional_price = variation.promotional_price
 
@@ -56,7 +56,7 @@ class AddToCart(View):
                     'product_name': product_name,
                     'product_id': product_id,
                     'variation_name': variation_name,
-                    'variation_pk': variation_pk,
+                    'variation_id': variation_id,
                     'unit_price': variation_price,
                     'promotional_unit_price': variation_promotional_price,
                     'quant_price': variation_price,
@@ -123,7 +123,45 @@ class AddToCart(View):
                 cart[pid]['quant_price'] = unit_price * cart_quantity
                 cart[pid]['promotional_quant_price'] = promotional_unit_price * cart_quantity
 
-        pprint(cart)
         self.request.session.save()
 
         return redirect(http_referer)
+
+
+class Cart(View):
+    template_name = 'product/cart.html'
+
+    def get(self, *args, **kwargs):
+        cart = self.request.session.get('cart')
+
+        self.context = {
+            'cart': cart,
+        }
+        return render(self.request, self.template_name, self.context)
+
+
+class DelFromCart(View):
+    def get(self, *args, **kwargs):
+        if not self.request.session.get('cart'):
+            messages.error(self.request,
+                           ec_messages.error_cart_empty)
+            return redirect('product:index')
+
+        cart = self.request.session.get('cart')
+        pk = str(self.kwargs.get('pk'))
+        item_quantity_cart = cart[pk]['quantity']
+
+        unit_price = cart[pk]['unit_price']
+        promotional_unit_price = cart[pk]['promotional_unit_price']
+
+        item_quantity_cart -= 1
+        cart[pk]['quant_price'] = unit_price * item_quantity_cart
+        cart[pk]['promotional_quant_price'] = promotional_unit_price * \
+            item_quantity_cart
+        cart[pk]['quantity'] = item_quantity_cart
+
+        if item_quantity_cart <= 0:
+            cart.pop(pk)
+
+        self.request.session.save()
+        return redirect('product:cart')
