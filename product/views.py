@@ -32,6 +32,8 @@ class AddToCart(View):
 
         if 'vid' in self.request.GET.keys():
             vid = self.request.GET.get('vid')
+            vid_cart_key = f'vid_{vid}'
+
             variation = Variation.objects.get(id=vid)
             variation_stock = variation.stock
             product = variation.product
@@ -51,8 +53,8 @@ class AddToCart(View):
             slug = product.slug
             quantity = 1
 
-            if vid not in cart.keys():
-                cart[vid] = {
+            if vid_cart_key not in cart.keys():
+                cart[vid_cart_key] = {
                     'product_name': product_name,
                     'product_id': product_id,
                     'variation_name': variation_name,
@@ -67,10 +69,10 @@ class AddToCart(View):
                 }
 
             else:
-                cart_quantity = cart[vid]['quantity']
+                cart_quantity = cart[vid_cart_key]['quantity']
                 product_stock = variation_stock
-                unit_price = cart[vid]['unit_price']
-                promotional_unit_price = cart[vid]['promotional_unit_price']
+                unit_price = cart[vid_cart_key]['unit_price']
+                promotional_unit_price = cart[vid_cart_key]['promotional_unit_price']
                 cart_quantity += 1
 
                 if cart_quantity >= product_stock:
@@ -78,12 +80,14 @@ class AddToCart(View):
                                    ec_messages.error_quantity_exceeded)
                     cart_quantity = product_stock
 
-                cart[vid]['quantity'] = cart_quantity
-                cart[vid]['quant_price'] = unit_price * cart_quantity
-                cart[vid]['promotional_quant_price'] = promotional_unit_price * cart_quantity
+                cart[vid_cart_key]['quantity'] = cart_quantity
+                cart[vid_cart_key]['quant_price'] = unit_price * cart_quantity
+                cart[vid_cart_key]['promotional_quant_price'] = promotional_unit_price * cart_quantity
 
         elif 'pid' in self.request.GET.keys():
             pid = self.request.GET.get('pid')
+            pid_cart_key = f'pid_{pid}'
+
             product = Product.objects.get(id=pid)
             db_stock = product.stock
 
@@ -94,8 +98,8 @@ class AddToCart(View):
             image = product.image.name
             slug = product.slug
 
-            if pid not in cart.keys():
-                cart[pid] = {
+            if pid_cart_key not in cart.keys():
+                cart[pid_cart_key] = {
                     'product_name': product_name,
                     'product_id': product_id,
                     'unit_price': product_price,
@@ -108,10 +112,10 @@ class AddToCart(View):
                 }
 
             else:
-                cart_quantity = cart[pid]['quantity']
+                cart_quantity = cart[pid_cart_key]['quantity']
                 product_stock = db_stock
-                unit_price = cart[pid]['unit_price']
-                promotional_unit_price = cart[pid]['promotional_unit_price']
+                unit_price = cart[pid_cart_key]['unit_price']
+                promotional_unit_price = cart[pid_cart_key]['promotional_unit_price']
                 cart_quantity += 1
 
                 if cart_quantity >= product_stock:
@@ -119,9 +123,9 @@ class AddToCart(View):
                                    ec_messages.error_quantity_exceeded)
                     cart_quantity = product_stock
 
-                cart[pid]['quantity'] = cart_quantity
-                cart[pid]['quant_price'] = unit_price * cart_quantity
-                cart[pid]['promotional_quant_price'] = promotional_unit_price * cart_quantity
+                cart[pid_cart_key]['quantity'] = cart_quantity
+                cart[pid_cart_key]['quant_price'] = unit_price * cart_quantity
+                cart[pid_cart_key]['promotional_quant_price'] = promotional_unit_price * cart_quantity
 
         self.request.session.save()
 
@@ -137,6 +141,7 @@ class Cart(View):
         self.context = {
             'cart': cart,
         }
+
         return render(self.request, self.template_name, self.context)
 
 
@@ -148,7 +153,17 @@ class DelFromCart(View):
             return redirect('product:index')
 
         cart = self.request.session.get('cart')
-        pk = str(self.kwargs.get('pk'))
+        name = self.kwargs.get('name')
+
+        variation = Variation.objects.filter(name__exact=name).first()
+        product = Product.objects.filter(name__exact=name).first()
+
+        if variation:
+            pk = f'vid_{variation.pk}'
+
+        if product:
+            pk = f'pid_{product.pk}'
+
         item_quantity_cart = cart[pk]['quantity']
 
         unit_price = cart[pk]['unit_price']
@@ -165,3 +180,25 @@ class DelFromCart(View):
 
         self.request.session.save()
         return redirect('product:cart')
+
+
+class Resume(View):
+    template_name = 'product/resume.html'
+
+    def get(self, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            messages.error(self.request,
+                           ec_messages.error_login_needed)
+            return redirect('profile:login')
+
+        if not self.request.session.get('cart'):
+            messages.error(self.request,
+                           ec_messages.error_cart_empty)
+            return redirect('product:index')
+
+        self.context = {
+            'cart': self.request.session.get('cart'),
+            'user': self.request.user,
+        }
+
+        return render(self.request, self.template_name, self.context)
