@@ -12,13 +12,10 @@
     {% include 'parciais/_nav.html' %}
 
     <main class="container mt-4 mb-4">
-        <div class="row">
-                {% include 'parciais/_messages.html' %}
+        {% include 'parciais/_messages.html' %}
 
-                {% block content %}
-                {% endblock content %}
-        </div>
-        {% include 'parciais/_pagination.html' %}
+        {% block content %}
+        {% endblock content %}
     </main>
 
 
