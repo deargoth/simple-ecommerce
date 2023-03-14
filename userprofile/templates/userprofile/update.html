@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div>
+    <h1 class="mb-0">Alteração de informações do seu perfil</h1>
+    <p class="lead">Deseja alterar seu perfil? Apenas modificar os campos abaixo!</p>
+
+    <div class="form-group w-50">
+        <form action="{% url 'profile:update' %}" method="POST">
+            {% csrf_token %}
+            {% for field in formprofile %}
+                {{ field|as_crispy_field }}
+            {% endfor %}
+
+            <div class="row">
+                <div class="col">
+                    <button type="submit" class="btn btn-block btn-primary btn-lg">
+                        Alterar
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock content %}

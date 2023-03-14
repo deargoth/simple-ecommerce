@@ -4,6 +4,8 @@ from . import forms
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from copy import deepcopy
+from utils import ec_messages
+from .models import Profile
 
 
 class Create(View):
@@ -27,7 +29,7 @@ class Create(View):
     def post(self, *args, **kwargs):
         if not self.formuser.is_valid() or not self.formprofile.is_valid():
             messages.error(self.request,
-                           'Algum campo de seu formulário está incorreto. Verifique e tente novamente')
+                           ec_messages.error_form_not_valid)
             return render(self.request, self.template_name, self.context)
 
         password = self.request.POST.get('password1')
@@ -40,8 +42,43 @@ class Create(View):
         profile.save()
 
         messages.success(self.request,
-                         f'Seu registro foi feito com sucesso! Agora logue e aproveite nosso site')
+                         ec_messages.success_register_done)
         return redirect('profile:login')
+
+
+class Update(View):
+    template_name = 'userprofile/update.html'
+
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+
+        profile = Profile.objects.get(user=self.request.user)
+
+        self.context = {
+            'formprofile': forms.FormCreateProfile(data=self.request.POST or None,
+                                                   instance=profile,
+                                                   )
+        }
+        self.formprofile = self.context['formprofile']
+
+    def get(self, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            messages.error(self.request,
+                           ec_messages.error_login_required)
+
+        return render(self.request, self.template_name, self.context)
+
+    def post(self, *args, **kwargs):
+        if not self.formprofile.is_valid():
+            messages.error(self.request,
+                           ec_messages.error_form_not_valid)
+            return render(self.request, self.template_name, self.context)
+
+        profile = self.formprofile.save(commit=False)
+        profile.user = self.request.user
+
+        profile.save()
+        return redirect('profile:update')
 
 
 class Login(View):
@@ -66,7 +103,7 @@ class Login(View):
             login(self.request,
                   auth)
             messages.success(self.request,
-                             f'Seja bem vindo ao nosso site, {self.request.user.first_name}!')
+                             ec_messages.success_login(self.request.user))
             return redirect('product:index')
 
         messages.error(self.request,
@@ -82,5 +119,5 @@ class Logout(View):
         self.request.session['cart'] = cart
 
         messages.error(self.request,
-                       'Você foi deslogado com sucesso')
+                       ec_messages.success_logout)
         return redirect('product:index')

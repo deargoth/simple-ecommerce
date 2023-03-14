@@ -6,6 +6,9 @@ from django.contrib.auth.models import PermissionsMixin
 from django.core.mail import send_mail
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from utils import ec_messages, utils
+import re
+from django.forms import ValidationError
 
 from .managers import UserManager
 
@@ -119,3 +122,30 @@ class Profile(models.Model):
 
     def __str__(self):
         return f'{self.user}'
+
+    def clean(self):
+        error_messages = {}
+
+        send_cpf = self.cpf or None
+        saved_cpf = None
+        cep = self.cep
+        profile = Profile.objects.filter(cpf=self.cpf).first()
+
+        if profile:
+            saved_cpf = profile.cpf
+            if saved_cpf is not None and self.pk != profile.pk:
+                error_messages['cpf'] = ec_messages.error_cpf_used
+
+        if not utils.valida_cpf(self.cpf):
+            error_messages['cpf'] = ec_messages.error_cpf_not_valid
+
+        if re.search(r'[^0-9]', self.cep) or len(self.cep) < 8:
+            error_messages['cep'] = ec_messages.error_cep_not_valid
+
+        if error_messages:
+            raise ValidationError(error_messages)
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+
+        super().save(*args, **kwargs)

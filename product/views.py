@@ -188,7 +188,7 @@ class Resume(View):
     def get(self, *args, **kwargs):
         if not self.request.user.is_authenticated:
             messages.error(self.request,
-                           ec_messages.error_login_needed)
+                           ec_messages.error_login_required)
             return redirect('profile:login')
 
         if not self.request.session.get('cart'):

@@ -25,13 +25,13 @@
                     <a class="dropdown-item" href="#">Another action</a>
                     <a class="dropdown-item" href="{% url 'profile:logout' %}">Logout</a>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#">Something else here</a>
+                    <a class="dropdown-item" href="{% url 'profile:update' %}">Conta</a>
                 </div>
             </li>
 
             {% if not request.user.is_authenticated %}
             <li class="nav-item active">
-                <a class="nav-link" href="{% url 'profile:create' %}">Login</a>
+                <a class="nav-link" href="{% url 'profile:login' %}">Login</a>
             </li>
             {% endif %}
 
